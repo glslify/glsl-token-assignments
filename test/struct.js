@@ -8,17 +8,21 @@ test('structs: without inline definition', (t) => {
       float x;
       float y;
     };
+
+    StructType a;
+    StructType b = StructType(2.0, 2.0);
+    uniform StructType[3] c;
   `
 
   var tokens = tokenize(src)
 
   assigns(tokens)
 
-  t.plan(6)
+  t.plan(12)
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
-    if (token.data === 'StructName') {
-      t.ok(token.definition, 'StructName is a definition')
+    if (token.data === 'StructName' || token.data === 'a' || token.data === 'b' || token.data === 'c') {
+      t.ok(token.definition, token.data + ' is a definition')
       t.ok(!token.structMember, token.data + ' is not a struct member')
     } else
     if (token.data === 'x' || token.data === 'y') {

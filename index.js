@@ -1,90 +1,169 @@
 var assignments = require('./assignments')
+var ignoredKeywords = require('./ignored')
 
 module.exports = assigns
 
+// Here be dragons. Apologies in advance for the hairy code!
 function assigns(tokens) {
-  var enterStruct = false
-  var inStruct    = false
+  var idx = 0
 
+  // Determine if a value has been assigned, e.g.
+  // x = 1.0;
+  // float x = 1.0;
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
+    var type  = token.type
 
-    token.assignment   = false
-    token.definition   = false
-    token.structMember = false
-
-    // Distinguish struct definitions, e.g.
-    // struct A {
-    //   float definition1;
-    //   float definition2;
-    // }
-    var type = token.type
-    var data = token.data
-    if (type === 'keyword' && data === 'struct') enterStruct = true
-    if (type === 'operator' && data === '{' && enterStruct) inStruct = true
-    if (type === 'operator' && data === '}') {
-      inStruct = false
-      enterStruct = false
-    }
-
-    // Only target identifiers and builtins, e.g.
-    // float x;
-    // gl_FragColor = vec4(1);
+    token.assignment = false
+    token.definition = false
     if (type !== 'ident' && type !== 'builtin') continue
+    idx = i + 1
 
-    // Determine if a value has been assigned, e.g.
-    // x = 1.0;
-    // float x = 1.0;
-    do {
-      var j = i
+    skipWhitespace(+1)
+    if (tokens[idx].type !== 'operator') continue
+    if (!assignments[tokens[idx].data]) continue
+    token.assignment = true
+  }
+
+  // Determine if a value is being defined, e.g.
+  // float x;
+  // float x, y, z;
+  // float x, y = vec3(sin(1.0 + 3.0)), z;
+  // float[3][2] x, y = vec3(sin(1.0 + 3.0)), z;
+  // float[][2] x, y = vec3(sin(1.0 + 3.0)), z;
+  // float x[2], y = vec3(sin(1.0 + 3.0)), z[4];
+  // float x(float y, float z) {};
+  // float x(float y[2], Thing[3] z) {};
+  // Thing x[2], y = Another(sin(1.0 + 3.0)), z[4];
+  for (var i = 0; i < tokens.length; i++) {
+    var datatype = tokens[i]
+    var type     = datatype.type
+    var data     = datatype.data
+
+    datatype.definition = false
+
+    if (type === 'keyword') {
+      if (ignoredKeywords[data]) continue
+    } else
+    if (type !== 'ident') continue
+
+    idx = i + 1
+
+    skipArrayDimensions()
+    if (tokens[idx].type !== 'ident') continue
+    tokens[idx++].definition = true
+    skipArrayDimensions()
+
+    // Function arguments/parameters
+    if (tokens[idx].data === '(') {
+      idx++
 
       skipWhitespace(+1)
-      if (tokens[j].type !== 'operator') break
-      if (!assignments[tokens[j].data]) break
-      token.assignment = true
-    } while(false)
+      while (tokens[idx] && tokens[idx].data !== ')') {
+        if (tokens[idx].type !== 'keyword' && tokens[idx].type !== 'ident') break
+        idx++
+        skipWhitespace(+1)
+        if (tokens[idx].type !== 'ident') continue
+        tokens[idx++].definition = true
+        skipWhitespace(+1)
+        skipArrayDimensions()
+        skipWhitespace(+1)
+        if (tokens[idx].data !== ',') continue
+        idx++
+        skipWhitespace(+1)
+      }
 
-    // Determine if a value is a new variable definition, e.g.
-    // float x;
-    // float x = 1.0;
-    do {
-      var j = i
+      i = idx
+      continue
+    }
 
-      skipWhitespace(-1)
-      if (!tokens[j]) break
-      if (tokens[j].type !== 'keyword' && tokens[j].type !== 'ident') break
-      token.definition = !inStruct
-      token.structMember = inStruct
-    } while(false)
+    // Declaration Lists
+    while (tokens[idx] && tokens[idx].data !== ';') {
+      if (tokens[idx].data === ',') {
+        idx++
+        skipWhitespace(+1)
+        if (tokens[idx].definition = tokens[idx].type === 'ident') idx++
+      } else {
+        skipWhitespace(+1)
+        skipParens()
+        skipWhitespace(+1)
+        idx++
+      }
+    }
 
-    // Special case for inline struct definitions, e.g.
-    // struct Thing {
-    //   float x;
-    //   float y;
-    // } definition;
-    if (!token.definition) do {
-      var j = i
+    i = idx
+  }
 
-      skipWhitespace(-1)
-      if (!tokens[j]) break
-      if (tokens[j].type !== 'operator') break
-      if (tokens[j].data !== '}') break
-      while (tokens[--j] && tokens[j].data !== '{');
+  // Handle struct definitions:
+  // struct Definition {
+  //   float x, y, z;
+  //   Other w;
+  // } definition;
+  for (var i = 0; i < tokens.length; i++) {
+    var token = tokens[i]
+    if (token.type !== 'keyword') continue
+    if (token.data !== 'struct') continue
+    idx = i + 1
+    skipWhitespace(+1)
+    if (tokens[idx].type !== 'ident') continue
 
-      skipWhitespace(-1)
-      if (!tokens[j]) break
+    idx++
+    skipWhitespace(+1)
+    if (tokens[idx++].data !== '{') continue
+    skipWhitespace(+1)
 
-      skipWhitespace(-1)
-      if (!tokens[j]) break
-      if (tokens[j].type !== 'keyword') break
-      if (tokens[j].data !== 'struct') break
-      token.definition = true
-    } while(false)
+    while (tokens[idx].type === 'ident' || tokens[idx].type === 'keyword') {
+      do {
+        idx++
+        skipWhitespace(+1)
+        tokens[idx].structMember = true
+        tokens[idx].definition = false
+        idx++
+        skipArrayDimensions()
+      } while (tokens[idx].data === ',')
+
+      if (tokens[idx].data === ';') idx++
+      skipWhitespace()
+    }
+
+    idx++
+    skipWhitespace(+1)
+    if (tokens[idx].type !== 'ident') continue
+    tokens[idx].definition = true
+    skipWhitespace(+1)
+
+    while (tokens[++idx].data === ',') {
+      skipWhitespace(+1)
+      idx++
+      skipWhitespace(+1)
+      if (tokens[idx].type === 'ident') tokens[idx].definition = true
+      skipWhitespace(+1)
+    }
   }
 
   return tokens
 
   function skipWhitespace(n) {
-    while (tokens[j += n] && tokens[j].type === 'whitespace');
+    while (tokens[idx] && tokens[idx].type === 'whitespace') idx++
+  }
+
+  function skipArrayDimensions() {
+    while (tokens[idx] && (
+         tokens[idx].type === 'integer'
+      || tokens[idx].data === '['
+      || tokens[idx].data === ']'
+      || tokens[idx].type === 'whitespace'
+    )) idx++
+  }
+
+  function skipParens() {
+    if (tokens[idx].data !== '(') return
+    var depth = 0
+    var a = idx
+    do {
+      if (tokens[idx].data === ';') break
+      if (tokens[idx].data === '(') depth++
+      if (tokens[idx].data === ')') depth--
+    } while(depth && tokens[++idx])
   }
 }

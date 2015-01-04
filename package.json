@@ -7,7 +7,8 @@
   "scripts": {
     "test": "npm run test:node && npm run test:browser",
     "test:node": "node test | tap-spec",
-    "test:browser": "browserify -t 6to5ify test | tap-closer | smokestack | tap-spec"
+    "test:browser": "browserify -t 6to5ify test | tap-closer | smokestack | tap-spec",
+    "test:browser:view": "browserify -t 6to5ify test | smokestack | tap-spec"
   },
   "author": {
     "name": "Hugh Kennedy",
