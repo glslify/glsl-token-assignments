@@ -25,7 +25,7 @@ test('array variables', (t) => {
 
   assigns(tokens)
 
-  var definitions = {
+  var declarations = {
       a_1d: true
     , a_2d: true
     , a_2du: true
@@ -51,14 +51,14 @@ test('array variables', (t) => {
     , fail_6: false
   }
 
-  t.plan(Object.keys(definitions).length)
+  t.plan(Object.keys(declarations).length)
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
-    if (!(token.data in definitions)) continue
-    if (definitions[token.data]) {
-      t.ok(token.definition, token.data + ' is a definition')
+    if (!(token.data in declarations)) continue
+    if (declarations[token.data]) {
+      t.ok(token.declaration, token.data + ' is a declaration')
     } else {
-      t.ok(!token.definition, token.data + ' is not a definition')
+      t.ok(!token.declaration, token.data + ' is not a declaration')
     }
   }
 })

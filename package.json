@@ -1,7 +1,7 @@
 {
   "name": "glsl-token-assignments",
   "version": "1.0.0",
-  "description": "Take an array of GLSL tokens and determine which tokens are either assignments or variable definitions.",
+  "description": "Take an array of GLSL tokens and determine which tokens are either assignments or variable declarations.",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -37,7 +37,7 @@
     "glsl",
     "tokens",
     "assignments",
-    "definitions"
+    "declarations"
   ],
   "homepage": "https://github.com/stackgl/glsl-token-assignments",
   "bugs": {

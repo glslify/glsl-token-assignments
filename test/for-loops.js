@@ -21,19 +21,19 @@ test('for loops', (t) => {
     if (token.data !== 'i') continue; j++
     if (j === 1) {
       t.ok(token.assignment, 'first `i` is an assignment')
-      t.ok(token.definition, 'first `i` is a definition')
+      t.ok(token.declaration, 'first `i` is a declaration')
     } else
     if (j === 2) {
       t.ok(!token.assignment, 'second `i` is not an assignment')
-      t.ok(!token.definition, 'second `i` is not a definition')
+      t.ok(!token.declaration, 'second `i` is not a declaration')
     } else
     if (j === 3) {
       t.ok(token.assignment, 'third `i` is an assignment')
-      t.ok(!token.definition, 'third `i` is not a definition')
+      t.ok(!token.declaration, 'third `i` is not a declaration')
     } else
     if (j === 4) {
       t.ok(!token.assignment, 'fourth `i` is not an assignment')
-      t.ok(!token.definition, 'fourth `i` is not a definition')
+      t.ok(!token.declaration, 'fourth `i` is not a declaration')
     }
   }
 

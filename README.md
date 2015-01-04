@@ -3,7 +3,7 @@
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
 Take an array of GLSL tokens and determine which tokens are either assignments
-or variable definitions.
+or variable declarations.
 
 ## Usage
 
@@ -19,7 +19,7 @@ following boolean values for each `ident` token, i.e. any variable names:
 
 If the value of the variable is being changed here.
 
-#### `token.definition`
+#### `token.declaration`
 
 If a new variable is being defined here for this scope.
 

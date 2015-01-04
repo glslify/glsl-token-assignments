@@ -38,36 +38,36 @@ test('function arguments', testSource(`
   , Thing: new Array(10).map(() => false)
 }))
 
-function testSource(src, definitions) {
+function testSource(src, declarations) {
   var tokens = tokenize(src.trim())
-  var total  = Object.keys(definitions)
-    .reduce((n, key) => n + definitions[key].length, 0)
+  var total  = Object.keys(declarations)
+    .reduce((n, key) => n + declarations[key].length, 0)
 
   assigns(tokens)
 
   if (!process.browser) {
     for (var i = 0; i < tokens.length; i++) {
       var token = tokens[i]
-      if (token.definition) process.stderr.write('~')
+      if (token.declaration) process.stderr.write('~')
       process.stderr.write(token.data)
-      if (token.definition) process.stderr.write('~')
+      if (token.declaration) process.stderr.write('~')
     }
   }
 
   return (t) => {
-    var counter = Object.keys(definitions)
+    var counter = Object.keys(declarations)
       .reduce((map, key) => { map[key] = 0; return map }, {})
 
     t.plan(total)
 
     for (var i = 0; i < tokens.length; i++) {
       var token = tokens[i]
-      if (!(token.data in definitions)) continue
+      if (!(token.data in declarations)) continue
       var j = counter[token.data]++
-      if (definitions[token.data][j]) {
-        t.ok(token.definition, `${token.data} #${j+1} is a definition`)
+      if (declarations[token.data][j]) {
+        t.ok(token.declaration, `${token.data} #${j+1} is a declaration`)
       } else {
-        t.ok(!token.definition, `${token.data} #${j+1} is not a definition`)
+        t.ok(!token.declaration, `${token.data} #${j+1} is not a declaration`)
       }
     }
   }

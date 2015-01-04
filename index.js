@@ -15,7 +15,7 @@ function assigns(tokens) {
     var type  = token.type
 
     token.assignment = false
-    token.definition = false
+    token.declaration = false
     if (type !== 'ident' && type !== 'builtin') continue
     idx = i + 1
 
@@ -40,7 +40,7 @@ function assigns(tokens) {
     var type     = datatype.type
     var data     = datatype.data
 
-    datatype.definition = false
+    datatype.declaration = false
 
     if (type === 'keyword') {
       if (ignoredKeywords[data]) continue
@@ -51,7 +51,7 @@ function assigns(tokens) {
 
     skipArrayDimensions()
     if (tokens[idx].type !== 'ident') continue
-    tokens[idx++].definition = true
+    tokens[idx++].declaration = true
     skipArrayDimensions()
 
     // Function arguments/parameters
@@ -64,7 +64,7 @@ function assigns(tokens) {
         idx++
         skipWhitespace(+1)
         if (tokens[idx].type !== 'ident') continue
-        tokens[idx++].definition = true
+        tokens[idx++].declaration = true
         skipWhitespace(+1)
         skipArrayDimensions()
         skipWhitespace(+1)
@@ -82,7 +82,7 @@ function assigns(tokens) {
       if (tokens[idx].data === ',') {
         idx++
         skipWhitespace(+1)
-        if (tokens[idx].definition = tokens[idx].type === 'ident') idx++
+        if (tokens[idx].declaration = tokens[idx].type === 'ident') idx++
       } else {
         skipWhitespace(+1)
         skipParens()
@@ -94,11 +94,11 @@ function assigns(tokens) {
     i = idx
   }
 
-  // Handle struct definitions:
-  // struct Definition {
+  // Handle struct declarations:
+  // struct declaration {
   //   float x, y, z;
   //   Other w;
-  // } definition;
+  // } declaration;
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
     if (token.type !== 'keyword') continue
@@ -117,7 +117,7 @@ function assigns(tokens) {
         idx++
         skipWhitespace(+1)
         tokens[idx].structMember = true
-        tokens[idx].definition = false
+        tokens[idx].declaration = false
         idx++
         skipArrayDimensions()
       } while (tokens[idx].data === ',')
@@ -129,14 +129,14 @@ function assigns(tokens) {
     idx++
     skipWhitespace(+1)
     if (tokens[idx].type !== 'ident') continue
-    tokens[idx].definition = true
+    tokens[idx].declaration = true
     skipWhitespace(+1)
 
     while (tokens[++idx].data === ',') {
       skipWhitespace(+1)
       idx++
       skipWhitespace(+1)
-      if (tokens[idx].type === 'ident') tokens[idx].definition = true
+      if (tokens[idx].type === 'ident') tokens[idx].declaration = true
       skipWhitespace(+1)
     }
   }

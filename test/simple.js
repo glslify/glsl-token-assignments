@@ -15,7 +15,7 @@ test('simple: assignment', (t) => {
   }
 })
 
-test('simple: definition', (t) => {
+test('simple: declaration', (t) => {
   var src = 'float x;'
   var tokens = tokenize(src)
 
@@ -24,11 +24,11 @@ test('simple: definition', (t) => {
   t.plan(1)
   for (var i = 0; i < tokens.length; i++) {
     if (tokens[i].data !== 'x') continue
-    t.ok(tokens[i].definition, 'x is an definition')
+    t.ok(tokens[i].declaration, 'x is an declaration')
   }
 })
 
-test('simple: definition + assignment', (t) => {
+test('simple: declaration + assignment', (t) => {
   var src = 'float x = 1.0;'
   var tokens = tokenize(src)
 
@@ -37,7 +37,7 @@ test('simple: definition + assignment', (t) => {
   t.plan(2)
   for (var i = 0; i < tokens.length; i++) {
     if (tokens[i].data !== 'x') continue
-    t.ok(tokens[i].definition, 'x is an definition')
+    t.ok(tokens[i].declaration, 'x is an declaration')
     t.ok(tokens[i].assignment, 'x is an assignment')
   }
 })

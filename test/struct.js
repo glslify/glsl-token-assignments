@@ -2,7 +2,7 @@ const tokenize = require('glsl-tokenizer/string')
 const test     = require('tape')
 const assigns  = require('../')
 
-test('structs: without inline definition', (t) => {
+test('structs: without inline declaration', (t) => {
   var src = `
     struct StructName {
       float x;
@@ -22,17 +22,17 @@ test('structs: without inline definition', (t) => {
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
     if (token.data === 'StructName' || token.data === 'a' || token.data === 'b' || token.data === 'c') {
-      t.ok(token.definition, token.data + ' is a definition')
+      t.ok(token.declaration, token.data + ' is a declaration')
       t.ok(!token.structMember, token.data + ' is not a struct member')
     } else
     if (token.data === 'x' || token.data === 'y') {
-      t.ok(!token.definition, token.data + ' is not a definition')
+      t.ok(!token.declaration, token.data + ' is not a declaration')
       t.ok(token.structMember, token.data + ' is a struct member')
     }
   }
 })
 
-test('structs: without inline definition', (t) => {
+test('structs: without inline declaration', (t) => {
   var src = `
     struct StructName {
       float x;
@@ -48,15 +48,15 @@ test('structs: without inline definition', (t) => {
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
     if (token.data === 'StructName') {
-      t.ok(token.definition, 'StructName is a definition')
+      t.ok(token.declaration, 'StructName is a declaration')
       t.ok(!token.structMember, 'StructName is not a struct member')
     } else
     if (token.data === 'x' || token.data === 'y') {
-      t.ok(!token.definition, token.data + ' is not a definition')
+      t.ok(!token.declaration, token.data + ' is not a declaration')
       t.ok(token.structMember, token.data + ' is a struct member')
     } else
     if (token.data === 'structName') {
-      t.ok(token.definition, 'structName is a definition')
+      t.ok(token.declaration, 'structName is a declaration')
       t.ok(!token.structMember, 'structName is not a struct member')
     }
   }

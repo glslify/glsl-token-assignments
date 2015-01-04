@@ -24,15 +24,15 @@ test('comma-separated variables', (t) => {
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
     if (token.data === 'a' || token.data === 'b' || token.data === 'c' || token.data === 'm' || token.data === 'n') {
-      t.ok(token.definition, token.data + ' is a definition')
+      t.ok(token.declaration, token.data + ' is a declaration')
       t.ok(!token.structMember, token.data + ' is not a struct member')
     } else
     if (token.data === 'x' || token.data === 'y' || token.data === 'z' || token.data === 'l') {
-      t.ok(!token.definition, token.data + ' is not a definition')
+      t.ok(!token.declaration, token.data + ' is not a declaration')
       t.ok(token.structMember, token.data + ' is a struct member')
     } else
     if (token.data === 'i' || token.data === 'j' || token.data === 'k') {
-      t.ok(token.definition, token.data + ' is a definition')
+      t.ok(token.declaration, token.data + ' is a declaration')
       t.ok(!token.structMember, token.data + ' is not a struct member')
     }
   }
