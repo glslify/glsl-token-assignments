@@ -1,6 +1,5 @@
-const tokenize = require('glsl-tokenizer/string')
-const test     = require('tape')
-const assigns  = require('../')
+const testSource = require('./util-test-source')
+const test       = require('tape')
 
 /**
  * glsl-specular-beckmann: @mikolalysenko's GLSL style,
@@ -540,29 +539,3 @@ void main( void )
   gl_FragColor: [false]
   , time: [true, false, false, true, false, false, false, false]
 }))
-
-function testSource(src, declarations) {
-  var tokens = tokenize(src.trim())
-  var total  = Object.keys(declarations)
-    .reduce((n, key) => n + declarations[key].length, 0)
-
-  assigns(tokens)
-
-  return (t) => {
-    var counter = Object.keys(declarations)
-      .reduce((map, key) => { map[key] = 0; return map }, {})
-
-    t.plan(total)
-
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i]
-      if (!(token.data in declarations)) continue
-      var j = counter[token.data]++
-      if (declarations[token.data][j]) {
-        t.ok(token.declaration, `${token.data} #${j+1} is a declaration`)
-      } else {
-        t.ok(!token.declaration, `${token.data} #${j+1} is not a declaration`)
-      }
-    }
-  }
-}

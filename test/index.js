@@ -1,3 +1,4 @@
+require('../') // ensure user-facing code isn't transpiled
 require('6to5/register')
 
 require('./simple')
