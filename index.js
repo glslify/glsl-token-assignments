@@ -157,6 +157,7 @@ function assigns(tokens) {
   }
 
   function skipParens() {
+    if (!tokens[idx]) return
     if (tokens[idx].data !== '(') return
     var depth = 0
     var a = idx
