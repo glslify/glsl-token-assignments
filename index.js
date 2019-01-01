@@ -64,6 +64,13 @@ function assigns(tokens) {
         idx++
         skipWhitespace(+1)
         if (tokens[idx].type !== 'ident') continue
+
+        // Handle the case of a parameter like "in StructName myArg", where if
+        // there's one ident after another, assume the one we're on is the
+        // StructName, identified in the higher scope, and not a declaration
+        var nextNonWhitespace = peekPastWhitespace()
+        if (nextNonWhitespace && nextNonWhitespace.type === 'ident') continue
+
         tokens[idx++].declaration = true
         skipWhitespace(+1)
         skipArrayDimensions()
@@ -142,6 +149,12 @@ function assigns(tokens) {
   }
 
   return tokens
+
+  function peekPastWhitespace() {
+    var peekIdx = idx + 1;
+    while (tokens[peekIdx] && tokens[peekIdx].type === 'whitespace') peekIdx++
+    return tokens[peekIdx];
+  }
 
   function skipWhitespace(n) {
     while (tokens[idx] && tokens[idx].type === 'whitespace') idx++
