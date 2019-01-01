@@ -7,6 +7,10 @@ float aFunction(vec2 a, vec3 b, float c) {
   return z;
 }
 
+float sFunction(UserStruct structArg);
+float sFunction(const UserStruct structArg);
+float sFunction(const in UserStruct structArg);
+
 Thing xFunction(vec2 d, Thing e[2], Thing f, Thing g[2][5]);
 Thing xFunction(vec2 d, Thing e[2], Thing f, Thing g[2][5]) {
   Thing y = Thing(2.0);
@@ -34,5 +38,7 @@ Another yFunction(
   , i: [true]
   , j: [true]
   , k: [true]
+  , UserStruct: [false, false, false]
+  , structArg: [true, true, true]
   , Thing: new Array(10).map(() => false)
 }))
